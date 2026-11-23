@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Циан — главная на мобильных</title>
+    <style>
+      :root {
+        --cian: #2f71f3;
+        --cian-dark: #1f57c9;
+        --ink: #18233a;
+        --muted: #707a90;
+        --line: #e5eaf3;
+        --canvas: #f5f7fc;
+        --warm: #edf3ff;
+        --orange: #ff9f1c;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #e2e8f5;
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      button, input { font: inherit; }
+      button { cursor: pointer; }
+      .app {
+        position: relative;
+        width: min(100%, 430px);
+        min-height: 100vh;
+        margin: auto;
+        overflow: hidden;
+        background: #fff;
+      }
+      .top {
+        padding: 18px 16px 22px;
+        color: #fff;
+        background: linear-gradient(145deg, #376ff1 0%, #285fd8 75%, #1f4cab 100%);
+      }
+      .topline { display: flex; align-items: center; justify-content: space-between; }
+      .brand { font-size: 28px; font-weight: 800; letter-spacing: -1.5px; }
+      .profile {
+        width: 36px; height: 36px; border: 0; border-radius: 50%;
+        color: #fff; background: rgba(255,255,255,.2); font-size: 18px;
+      }
+      .greeting { margin: 24px 0 12px; font-size: 22px; font-weight: 700; letter-spacing: -.4px; }
+      .search {
+        display: flex; align-items: center; gap: 10px; height: 54px; padding: 0 14px;
+        border-radius: 16px; background: #fff; box-shadow: 0 9px 20px rgba(24,63,151,.18);
+      }
+      .search-icon { color: var(--cian); font-size: 22px; }
+      .search input { min-width: 0; flex: 1; border: 0; outline: 0; color: var(--ink); font-size: 15px; }
+      .filters { width: 31px; height: 31px; border: 0; border-radius: 10px; background: #eaf1ff; color: var(--cian-dark); font-weight: 900; }
+      .quick-tabs { display: flex; gap: 8px; margin-top: 14px; overflow-x: auto; scrollbar-width: none; }
+      .quick-tabs::-webkit-scrollbar, .h-scroll::-webkit-scrollbar { display: none; }
+      .tab {
+        flex: 0 0 auto; padding: 9px 13px; border: 1px solid rgba(255,255,255,.38); border-radius: 999px;
+        background: transparent; color: #fff; font-size: 13px;
+      }
+      .tab.active { border-color: #fff; background: #fff; color: var(--cian-dark); font-weight: 700; }
+      main { padding: 18px 0 92px; background: var(--canvas); }
+      .section { padding: 0 16px; margin-bottom: 26px; }
+      .section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+      h2 { margin: 0; font-size: 19px; letter-spacing: -.35px; }
+      .link { border: 0; background: none; padding: 0; color: var(--cian-dark); font-size: 13px; font-weight: 700; }
+      .state-switch { display: flex; padding: 3px; margin: 0 16px 18px; border-radius: 12px; background: #e5ece7; }
+      .state-switch button { flex: 1; border: 0; border-radius: 9px; padding: 8px; background: transparent; color: #66736c; font-size: 12px; }
+      .state-switch button.active { color: var(--ink); background: #fff; box-shadow: 0 1px 3px rgba(21,49,35,.12); font-weight: 700; }
+      .saved-search {
+        display: flex; align-items: center; gap: 11px; min-height: 76px; padding: 13px; border: 1px solid #dbe6df;
+        border-radius: 16px; background: #fff;
+      }
+      .saved-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 13px; background: #eaf1ff; color: var(--cian-dark); font-size: 19px; }
+      .saved-copy { flex: 1; }
+      .saved-title { margin-bottom: 4px; font-size: 14px; font-weight: 700; }
+      .saved-meta { color: var(--muted); font-size: 12px; }
+      .arrow { color: var(--cian-dark); font-size: 20px; }
+      .hidden { display: none !important; }
+      .h-scroll { display: flex; gap: 11px; margin: 0 -16px; padding: 0 16px 3px; overflow-x: auto; scrollbar-width: none; }
+      .listing {
+        flex: 0 0 218px; min-height: 222px; overflow: hidden; border-radius: 16px; background: #fff;
+        box-shadow: 0 1px 1px rgba(34,55,44,.04);
+      }
+      .listing-photo { position: relative; height: 122px; padding: 9px; color: #fff; background: linear-gradient(140deg, #c4d2c8, #82998b); }
+      .listing-photo.tan { background: linear-gradient(145deg, #d9c5a6, #9f886d); }
+      .listing-photo::after { content: ""; position: absolute; inset: 38px 23px 0; border-radius: 32px 32px 0 0; background: rgba(255,255,255,.44); }
+      .tag { position: relative; z-index: 1; display: inline-block; padding: 4px 7px; border-radius: 8px; background: rgba(22,40,30,.62); font-size: 10px; font-weight: 700; }
+      .heart { position: absolute; z-index: 1; top: 7px; right: 9px; width: 28px; height: 28px; border: 0; border-radius: 50%; color: #fff; background: rgba(22,40,30,.45); }
+      .listing-copy { padding: 10px 11px; }
+      .price { font-size: 15px; font-weight: 800; }
+      .details { margin-top: 4px; font-size: 12px; }
+      .location { margin-top: 5px; color: var(--muted); font-size: 11px; }
+      .ad { display: flex; align-items: center; gap: 13px; margin: 0 16px 26px; padding: 14px; border-radius: 16px; background: var(--warm); }
+      .ad-mark { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 13px; background: #ffe4a4; font-size: 19px; }
+      .ad small { display: block; color: #8e793f; font-size: 10px; }
+      .ad strong { display: block; margin: 3px 0; font-size: 13px; }
+      .ad span { color: #756b48; font-size: 12px; }
+      .verticals { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .vertical {
+        min-height: 112px; padding: 13px; border: 0; border-radius: 16px; text-align: left; color: var(--ink); background: #fff;
+      }
+      .vertical i { display: grid; place-items: center; width: 32px; height: 32px; margin-bottom: 17px; border-radius: 10px; color: var(--cian-dark); background: #eaf1ff; font-style: normal; }
+      .vertical b { display: block; font-size: 14px; }
+      .vertical small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+      .bottom-nav { position: fixed; z-index: 3; right: 0; bottom: 0; left: 0; width: min(100%, 430px); margin: auto; display: flex; justify-content: space-around; padding: 8px 8px 14px; border-top: 1px solid var(--line); background: rgba(255,255,255,.96); }
+      .bottom-nav button { display: grid; gap: 3px; min-width: 57px; border: 0; color: #849189; background: transparent; font-size: 10px; }
+      .bottom-nav button.active { color: var(--cian-dark); font-weight: 700; }
+      .nav-ico { font-size: 19px; }
+      .sheet { position: fixed; z-index: 8; inset: auto 0 0; width: min(100%, 430px); margin: auto; padding: 10px 16px 28px; border-radius: 24px 24px 0 0; background: #fff; box-shadow: 0 -12px 36px rgba(25,57,130,.22); transform: translateY(110%); transition: transform .25s ease; }
+      .sheet.open { transform: translateY(0); }
+      .handle { width: 36px; height: 4px; margin: 0 auto 18px; border-radius: 8px; background: #dce4de; }
+      .sheet h3 { margin: 0 0 14px; font-size: 19px; }
+      .sheet-option { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 0; border: 0; border-bottom: 1px solid var(--line); text-align: left; background: #fff; }
+      .sheet-option i { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: #eaf1ff; color: var(--cian-dark); font-style: normal; }
+      .toast { position: fixed; z-index: 10; left: 50%; bottom: 82px; padding: 10px 14px; border-radius: 999px; color: #fff; background: #1c3470; font-size: 12px; opacity: 0; transform: translate(-50%, 8px); transition: .2s; pointer-events: none; white-space: nowrap; }
+      .toast.show { opacity: 1; transform: translate(-50%, 0); }
+      @media (min-width: 431px) { .bottom-nav { position: absolute; } .sheet, .toast { position: absolute; } }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="top">
+        <div class="topline"><div class="brand">циан</div><button class="profile" aria-label="Профиль">◉</button></div>
+        <div class="greeting" id="greeting">Найдём место для жизни</div>
+        <label class="search"><span class="search-icon">⌕</span><input id="search" type="search" placeholder="Город, район или ЖК" aria-label="Поиск недвижимости" /><button class="filters" aria-label="Фильтры">≡</button></label>
+        <nav class="quick-tabs" aria-label="Быстрый выбор раздела">
+          <button class="tab active" data-vertical="Купить">Купить</button><button class="tab" data-vertical="Снять">Снять</button><button class="tab" data-vertical="Новостройки">Новостройки</button><button class="tab" data-vertical="Посуточно">Посуточно</button><button class="tab" data-vertical="Коммерческая">Коммерческая</button>
+        </nav>
+      </header>
+      <main>
+        <div class="state-switch" aria-label="Состояние пользователя"><button class="active" data-state="new">Новый пользователь</button><button data-state="returning">Возвращается</button></div>
+        <section class="section" id="saved-section">
+          <div class="section-head"><h2>Продолжить поиск</h2><button class="link">Все</button></div>
+          <button class="saved-search"><span class="saved-icon">⌂</span><span class="saved-copy"><span class="saved-title">Квартиры в Москве</span><span class="saved-meta">1–2 комнаты · до 18 млн ₽</span></span><span class="arrow">›</span></button>
+        </section>
+        <section class="section" id="new-section">
+          <div class="section-head"><h2>С чего начнём?</h2></div>
+          <div class="saved-search"><span class="saved-icon">⌕</span><span class="saved-copy"><span class="saved-title">Найдите свой район</span><span class="saved-meta">Укажите город, метро или адрес</span></span><span class="arrow">›</span></div>
+        </section>
+        <section class="section">
+          <div class="section-head"><h2>Рекомендуем вам</h2><button class="link" id="show-all">Смотреть всё</button></div>
+          <div class="h-scroll">
+            <article class="listing"><div class="listing-photo"><span class="tag">Подходит вам</span><button class="heart">♡</button></div><div class="listing-copy"><div class="price">14,8 млн ₽</div><div class="details">1-комн. · 39,6 м² · 8/24 этаж</div><div class="location">Москва, Черёмушки</div></div></article>
+            <article class="listing"><div class="listing-photo tan"><span class="tag">4 минуты от метро</span><button class="heart">♡</button></div><div class="listing-copy"><div class="price">12,4 млн ₽</div><div class="details">Студия · 31 м² · 11/17 этаж</div><div class="location">Москва, Бутырский</div></div></article>
+          </div>
+        </section>
+        <aside class="ad"><div class="ad-mark">%</div><div><small>РЕКЛАМА</small><strong>Ипотека, которая подходит вам</strong><span>Рассчитайте платёж за минуту</span></div></aside>
+        <section class="section">
+          <div class="section-head"><h2>Выберите, что ищете</h2></div>
+          <div class="verticals">
+            <button class="vertical" data-vertical="Купить"><i>⌂</i><b>Купить</b><small>Квартиру или дом</small></button>
+            <button class="vertical" data-vertical="Снять"><i>⌁</i><b>Снять</b><small>Надолго</small></button>
+            <button class="vertical" data-vertical="Новостройки"><i>▥</i><b>Новостройки</b><small>От застройщика</small></button>
+            <button class="vertical" data-vertical="Посуточно"><i>☼</i><b>Посуточно</b><small>На пару дней</small></button>
+            <button class="vertical" data-vertical="Коммерческая"><i>▤</i><b>Коммерческая</b><small>Для бизнеса</small></button>
+          </div>
+        </section>
+      </main>
+      <nav class="bottom-nav" aria-label="Навигация"><button class="active"><span class="nav-ico">⌂</span>Главная</button><button><span class="nav-ico">♡</span>Избранное</button><button><span class="nav-ico">✦</span>Сервисы</button><button><span class="nav-ico">☻</span>Профиль</button></nav>
+      <div class="sheet" id="sheet" aria-live="polite"><div class="handle"></div><h3 id="sheet-title">Купить недвижимость</h3><button class="sheet-option"><i>⌕</i><span><b>Поиск объявлений</b><br><small>Квартира, дом или участок</small></span></button><button class="sheet-option"><i>♡</i><span><b>Сохранить поиск</b><br><small>Новые варианты придут сами</small></span></button></div>
+      <div class="toast" id="toast">Откроем подходящие варианты</div>
+    </div>
+    <script>
+      const app = document.querySelector('.app');
+      const greeting = document.getElementById('greeting');
+      const saved = document.getElementById('saved-section');
+      const fresh = document.getElementById('new-section');
+      const sheet = document.getElementById('sheet');
+      const sheetTitle = document.getElementById('sheet-title');
+      const toast = document.getElementById('toast');
+      let toastTimer;
+      function notify(text) { toast.textContent = text; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 2200); }
+      function openVertical(name) { sheetTitle.textContent = name + ' недвижимость'; sheet.classList.add('open'); notify('Откроем «' + name + '»'); }
+      document.querySelectorAll('[data-vertical]').forEach((button) => button.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach((tab) => tab.classList.toggle('active', tab.dataset.vertical === button.dataset.vertical));
+        openVertical(button.dataset.vertical);
+      }));
+      document.querySelectorAll('[data-state]').forEach((button) => button.addEventListener('click', () => {
+        const returning = button.dataset.state === 'returning';
+        document.querySelectorAll('[data-state]').forEach((item) => item.classList.toggle('active', item === button));
+        saved.classList.toggle('hidden', !returning); fresh.classList.toggle('hidden', returning);
+        greeting.textContent = returning ? 'Продолжим поиск?' : 'Найдём место для жизни';
+      }));
+      document.getElementById('search').addEventListener('focus', () => notify('Введите город, район, метро или ЖК'));
+      document.querySelectorAll('.heart').forEach((heart) => heart.addEventListener('click', () => { heart.textContent = heart.textContent === '♡' ? '♥' : '♡'; notify(heart.textContent === '♥' ? 'Добавлено в избранное' : 'Удалено из избранного'); }));
+      document.getElementById('show-all').addEventListener('click', () => notify('Откроем все рекомендации'));
+      document.querySelector('.profile').addEventListener('click', () => notify('Профиль и настройки'));
+      document.addEventListener('click', (event) => { if (sheet.classList.contains('open') && !sheet.contains(event.target) && !event.target.closest('[data-vertical]')) sheet.classList.remove('open'); });
+    </script>
+  </body>
+</html>
